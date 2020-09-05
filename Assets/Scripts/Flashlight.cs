@@ -8,9 +8,6 @@ public class Flashlight : BaseObject
     private const int _maxCharge = 10;
 
     [SerializeField] private Light FlashLight;
-    [SerializeField] private float timeout = 10;
-    private float currTime;
-    private float currReloadTime;
 
     private KeyCode control = KeyCode.F;
 

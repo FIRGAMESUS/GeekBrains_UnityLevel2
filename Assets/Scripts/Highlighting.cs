@@ -5,13 +5,8 @@ using UnityEngine;
 public class Highlighting : MonoBehaviour
 {
     [SerializeField] private Material HighlightingMaterial;
-    private Transform prevObject, currentObject;
-    private Material prevMaterial, currentMaterial;
-
-    void Start()
-    {
-        
-    }
+    private Transform currentObject;
+    private Material currentMaterial;
 
     void Update()
     {
