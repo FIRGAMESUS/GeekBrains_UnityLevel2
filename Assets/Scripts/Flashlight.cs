@@ -45,18 +45,14 @@ public class Flashlight : BaseObject
         slider.minValue = 0;
         slider.maxValue = _maxCharge;
         Charge = _maxCharge;
-        ActiveFlashLight(true);
+        FlashActive = true;
     }
 
-    private void ActiveFlashLight(bool val)
-    {
-        FlashActive = val;
-    }
     void Update()
     {
         if (Input.GetKeyDown(control))
         {
-            ActiveFlashLight(!FlashLight.enabled);
+            FlashActive = !FlashActive;
         }
 
     }
@@ -71,7 +67,7 @@ public class Flashlight : BaseObject
                 Charge--;
                 Debug.Log(Charge);
             }
-            ActiveFlashLight(false);
+            FlashActive = false;
         }
         else
         {
