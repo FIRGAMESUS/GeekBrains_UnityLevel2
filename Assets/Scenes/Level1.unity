@@ -12775,7 +12775,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 190253fbb8204324f9ddb76ee954032b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HighlightingMaterial: {fileID: 0}
+  HighlightingMaterial: {fileID: 2100000, guid: 99edf06492b29d54b911c9659e8dd21c,
+    type: 2}
 --- !u!4 &1686943490 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: b29625256622657449753138ea2823d4,
