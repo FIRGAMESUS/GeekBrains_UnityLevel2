@@ -50,7 +50,7 @@ public abstract class BaseObject : MonoBehaviour
         else
         {
             Debug.Log("BaseObject: " + _name + " NO RIGIDBODY");
-            gameObject.AddComponent<Rigidbody>();
+            //gameObject.AddComponent<Rigidbody>();
         }
 
         if (GetComponent<Animator>())
