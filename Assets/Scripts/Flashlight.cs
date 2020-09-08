@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Flashlight : BaseObject
+public class Flashlight : MonoBehaviour
 {
     private const int _maxCharge = 10;
 
@@ -31,16 +31,15 @@ public class Flashlight : BaseObject
         set
         {
             _flashActive = value;
-            FlashLight.enabled = value;
-            StopAllCoroutines();
-            StartCoroutine(Timer(value));
+            //FlashLight.enabled = value;
+            //StopAllCoroutines();
+            //StartCoroutine(Timer(value));
         }
     }
 
 
-    protected override void Awake()
+    private void Awake()
     {
-        base.Awake();
         FlashLight = GetComponentInChildren<Light>();
         slider.minValue = 0;
         slider.maxValue = _maxCharge;

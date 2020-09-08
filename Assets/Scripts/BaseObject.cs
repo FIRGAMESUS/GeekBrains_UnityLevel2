@@ -20,10 +20,10 @@ public abstract class BaseObject : MonoBehaviour
     public Transform GoTransform { get => _goTransform; set => _goTransform = value; }
     public GameObject GoInstance { get => _goInstance; set => _goInstance = value; }
     public string Name { get => _name; set => _name = value; }
-    public Rigidbody Rigidbody { get => _rigidbody; set => _rigidbody = value; }
-    public Material Material { get => _material; set => _material = value; }
-    public Color Color { get => _color; set => _color = value; }
-    public Animator Animator { get => _animator; set => _animator = value; }
+    public Rigidbody GORigidbody { get => _rigidbody; set => _rigidbody = value; }
+    public Material GOMaterial { get => _material; set => _material = value; }
+    public Color GOColor { get => _color; set => _color = value; }
+    public Animator GOAnimator { get => _animator; set => _animator = value; }
     public bool IsVisible
     {
         get
