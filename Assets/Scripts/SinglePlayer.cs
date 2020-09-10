@@ -31,16 +31,18 @@ public class SinglePlayer : Unit
                 if (hit.collider.tag == "PickUp")
                 {
                     hit.transform.GetComponent<Rigidbody>().isKinematic = true;
-                    target = hit.transform.parent;
+                    target = hit.transform.parent.transform;
                     target.parent = McamT;
                 }
             }
         }
         else
         {
-            target.parent = null;
-            hit.transform.GetComponent<Rigidbody>().isKinematic = false;
+            if (target)
+            {
+                target.parent = null;
+                hit.transform.GetComponent<Rigidbody>().isKinematic = false;
+            }
         }
-
     }
 }
