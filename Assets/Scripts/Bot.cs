@@ -10,6 +10,9 @@ public class Bot : Unit
     private Transform _playerT;
     private int stoppingDistance = 3;
 
+    [SerializeField] private List<Vector3> targetPos;
+    private int currentInt;
+
     protected override void Awake()
     {
         base.Awake();
@@ -18,20 +21,30 @@ public class Bot : Unit
         _playerT = GameObject.FindObjectOfType<SinglePlayer>().transform;
         Health = 100;
         Dead = false;
+
+        _agent.stoppingDistance = 1f;
+        currentInt = 0;
+        Debug.Log(currentInt);
     }
 
     private void Update()
     {
         _agent.stoppingDistance = stoppingDistance;
-        _agent.SetDestination(_playerT.position);
+        //_agent.SetDestination(_playerT.position);
+
+        _agent.SetDestination(targetPos[currentInt]);
 
         if (_agent.remainingDistance > _agent.stoppingDistance)
         {
             GOAnimator.SetBool("move", true);
+            
         }
         else
         {
             GOAnimator.SetBool("move", false);
+            currentInt++;
+            if (currentInt > targetPos.Count - 1) currentInt = 0;
+            Debug.Log(currentInt);
         }
 
         if (Dead)
