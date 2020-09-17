@@ -10,15 +10,16 @@ public abstract class Unit : BaseObject, ISetDamage
 
     public void SetDamage(int damage)
     {
-        if (_health > 0)
+        if(_health > 0)
         {
             _health -= damage;
         }
 
-        if (_health <= 0)
+        if(_health <= 0)
         {
             _health = 0;
-            if (tag != "Player")
+
+            if(tag != "Player")
             {
                 _dead = true;
             }

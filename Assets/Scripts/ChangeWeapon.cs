@@ -3,21 +3,22 @@
 public class ChangeWeapon : MonoBehaviour
 {
     [SerializeField] private int weaponID = 0;
-    private int prevWeaponID;
+    private int previousWeaponID;
     private Transform GOTransform;
 
-    private void Awake()
+    void Awake()
     {
         GOTransform = transform;
         SelectWeapon();
+
     }
 
-    private void SelectWeapon()
+   private void SelectWeapon()
     {
         int i = 0;
         foreach (Transform weapon in GOTransform)
         {
-            if (i == weaponID)
+            if(i == weaponID)
             {
                 weapon.gameObject.SetActive(true);
             }
@@ -29,13 +30,13 @@ public class ChangeWeapon : MonoBehaviour
         }
     }
 
-    private void Update()
+    void Update()
     {
-        prevWeaponID = weaponID;
+        previousWeaponID = weaponID;
 
-        if (Input.GetAxis("Mouse ScrollWheel") < 0)
+        if(Input.GetAxis("Mouse ScrollWheel") < 0)
         {
-            if (weaponID >= GOTransform.childCount - 1)
+            if(weaponID >= GOTransform.childCount-1)
             {
                 weaponID = 0;
             }
@@ -44,6 +45,7 @@ public class ChangeWeapon : MonoBehaviour
                 weaponID++;
             }
         }
+
         if (Input.GetAxis("Mouse ScrollWheel") > 0)
         {
             if (weaponID <= 0)
@@ -56,7 +58,7 @@ public class ChangeWeapon : MonoBehaviour
             }
         }
 
-        if (prevWeaponID != weaponID)
+        if(previousWeaponID!=weaponID)
         {
             SelectWeapon();
         }

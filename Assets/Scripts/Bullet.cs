@@ -11,11 +11,12 @@ public class Bullet : MonoBehaviour
     public int Damage { get => _damage; set => _damage = value; }
     public float DestructionTime { get => _destructionTime; set => _destructionTime = value; }
 
-    private void Awake()
+    void Awake()
     {
         Destroy(gameObject, _destructionTime);
         hitParticle = Resources.Load<GameObject>("Prefabs/Flare");
     }
+
     private void SetDamage(ISetDamage obj)
     {
         if (obj != null)
@@ -23,15 +24,20 @@ public class Bullet : MonoBehaviour
             obj.SetDamage(_damage);
         }
     }
+
     private void CreateParticleHit(Collision other)
     {
         GameObject tempHit = Instantiate(hitParticle, transform.position, Quaternion.identity);
         tempHit.transform.parent = other.transform;
         Destroy(tempHit, 0.5f);
     }
+
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.tag == "Player") return;
+        if(collision.gameObject.tag == "Player")
+        {
+            return;
+        }
         else
         {
             SetDamage(collision.gameObject.GetComponent<ISetDamage>());

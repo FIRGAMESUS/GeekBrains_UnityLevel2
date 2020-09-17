@@ -2,55 +2,236 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEditor;
 
 
 public class Bot : Unit
 {
+
     private NavMeshAgent _agent;
     private Transform _playerT;
-    private int stoppingDistance = 3;
+    private Transform target;
 
-    [SerializeField] private List<Vector3> targetPos;
-    private int currentInt;
+    private List<Vector3> _wayPoints = new List<Vector3>();
+    private int pointCounter;
+    [SerializeField] private GameObject wayPointMain; //change it to load from file
+
+    [SerializeField] private float DelayFindTargets = 0.1f;
+    private float _seekDistance = 3f;
+    private float _stopDistance = 0.4f;
+    private float _attackDistance = 7f;
+
+    private float timeWait = 3f;
+    private float timeOut = 0;
+
+    //Shooting
+    private int bulletCount = 30;
+    private int currentBullCount = 0;
+    private float shootDistance = 1000f;
+    private int damage = 20;
+    [SerializeField] protected Transform gunT;
+    [SerializeField] protected ParticleSystem muzzleFlash;
+    [SerializeField] protected GameObject hitParticle;
+
+
+    [SerializeField] private bool patrol;
+    [SerializeField] private bool shooting;
+
+    //Target
+    [SerializeField] private Collider[] targetInViewRadius;
+    [SerializeField] private List<Transform> visibleTargets = new List<Transform>();
+
+    [SerializeField] private float maxAngle = 30;//60
+    [SerializeField] private float maxRadius = 10;
+
+    [SerializeField] private LayerMask targetMask;
+    [SerializeField] private LayerMask obstacleMask;
+
+#if UNITY_EDITOR
+
+    private void OnDrawGizmos()
+    {
+        Vector3 pos = transform.position + Vector3.up;
+        Handles.color = new Color(1, 0, 1, 0.1f);
+
+        Handles.DrawSolidArc(pos, transform.up, transform.forward, maxAngle, maxRadius);
+        Handles.DrawSolidArc(pos, transform.up, transform.forward, -maxAngle, maxRadius);
+    }
+
+#endif
+    IEnumerator Shoot(RaycastHit playerHit)
+    {
+        yield return new WaitForSeconds(0.5f);
+        muzzleFlash.Play();
+        playerHit.collider.GetComponent<ISetDamage>().SetDamage(damage);
+        GameObject temp = Instantiate(hitParticle, playerHit.point, Quaternion.identity);
+        temp.transform.parent = playerHit.transform;
+        Destroy(temp, 0.8f);
+        shooting = false;
+    }
+
+    IEnumerator FindTargets(float delay)
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(delay);
+            FindVisibleTargets();
+        }
+    }
+
 
     protected override void Awake()
     {
         base.Awake();
-
         _agent = GetComponent<NavMeshAgent>();
+
         _playerT = GameObject.FindObjectOfType<SinglePlayer>().transform;
+
+        _agent.stoppingDistance = _stopDistance;
+        _agent.updatePosition = true;
+        _agent.updateRotation = true;
+        patrol = true;
+
         Health = 100;
         Dead = false;
 
-        _agent.stoppingDistance = 1f;
-        currentInt = 0;
-        Debug.Log(currentInt);
+        foreach (Transform item in wayPointMain.transform)
+        {
+            _wayPoints.Add(item.position);
+        }
+
+        StartCoroutine(FindTargets(DelayFindTargets));
+
+        gunT = GameObject.FindGameObjectWithTag("GunT").transform;
+        muzzleFlash = GetComponentInChildren<ParticleSystem>();
+        hitParticle = Resources.Load<GameObject>("Prefabs/Flare");
     }
 
-    private void Update()
+    private void FindVisibleTargets()
     {
-        _agent.stoppingDistance = stoppingDistance;
-        //_agent.SetDestination(_playerT.position);
+        targetInViewRadius = Physics.OverlapSphere(transform.position + Vector3.up, maxRadius, targetMask);
+        for (int i = 0; i < targetInViewRadius.Length; i++)
+        {
+            Transform tempTarget = targetInViewRadius[i].transform;
 
-        _agent.SetDestination(targetPos[currentInt]);
+            Vector3 dirToTarget = (tempTarget.position - transform.position).normalized;
+            float targetAngle = Vector3.Angle(transform.forward, dirToTarget);
 
-        if (_agent.remainingDistance > _agent.stoppingDistance)
+            if ((-maxAngle)< targetAngle && targetAngle < maxAngle)
+            {
+                if(!Physics.Raycast(transform.position + Vector3.up, dirToTarget, obstacleMask))
+                {
+                    if(!visibleTargets.Contains(tempTarget))
+                    {
+                        visibleTargets.Add(tempTarget);
+                    }
+                }
+            }
+        }
+    }
+
+
+    void Update()
+    {
+       
+
+        if (visibleTargets.Count > 0)
+        {
+            patrol = false;
+            target = visibleTargets[0];
+            float DistToTarget = Vector3.Distance(transform.position, target.position);
+
+
+            if (DistToTarget > maxRadius)
+            {
+                visibleTargets.Clear();
+            }
+        }
+        else
+        {
+            patrol = true;
+        }
+
+
+        if(patrol)
+        {
+            if(_wayPoints.Count > 1)
+            {
+                _agent.stoppingDistance = _stopDistance;
+                _agent.SetDestination(_wayPoints[pointCounter]);
+
+                if(!_agent.hasPath)
+                {
+                    timeOut += 0.1f;
+                    if(timeOut>timeWait)
+                    {
+                        timeOut = 0;
+                        if(pointCounter < _wayPoints.Count-1)
+                        {
+                            pointCounter++;
+                        }
+                        else
+                        {
+                            pointCounter = 0;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                _agent.stoppingDistance = _seekDistance;
+                _agent.SetDestination(_playerT.position);
+            }
+        }
+        else
+        {
+            _agent.stoppingDistance = _attackDistance;
+            _agent.SetDestination(target.position);
+
+            if (!Dead)
+            {
+                transform.LookAt(new Vector3(target.position.x, 0, target.position.z));
+
+                RaycastHit hit;
+
+                Ray ray = new Ray(transform.position + Vector3.up, transform.forward);
+
+                if (Physics.Raycast(ray, out hit, 500f, targetMask))
+                {
+                    if (!shooting)
+                    {
+                        _agent.ResetPath();
+                        GOAnimator.SetBool("shoot", true);
+                        shooting = true;
+                        StartCoroutine(Shoot(hit));
+                    }
+                    else
+                    {
+                        GOAnimator.SetBool("shoot", false);
+                    }
+                }
+                else
+                {
+                    _agent.stoppingDistance = _seekDistance;
+                    _agent.SetDestination(target.position);
+                }
+            }
+        }
+
+
+        if(_agent.remainingDistance > _agent.stoppingDistance)
         {
             GOAnimator.SetBool("move", true);
-            
         }
         else
         {
             GOAnimator.SetBool("move", false);
-            currentInt++;
-            if (currentInt > targetPos.Count - 1) currentInt = 0;
-            Debug.Log(currentInt);
         }
 
-        if (Dead)
+        if(Dead)
         {
             _agent.ResetPath();
-            GORigidbody.isKinematic = true;
+            GORigibody.isKinematic = true;
             GOAnimator.SetBool("die", true);
             Destroy(gameObject, 5f);
             return;

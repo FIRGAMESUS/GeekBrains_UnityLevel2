@@ -1,81 +1,48 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Flashlight : MonoBehaviour
 {
-    private const int _maxCharge = 10;
+    [SerializeField]private Light FlashLight;
 
-    [SerializeField] private Light FlashLight;
+    [SerializeField]private float timeout = 10;
+    [SerializeField]private float currTime;
+    private float currReloadTime;
 
     private KeyCode control = KeyCode.F;
-
-    [SerializeField] private Slider slider;
-
-    private float _charge;
-    public float Charge 
-    { 
-        get => _charge; 
-        set
-        {
-            _charge = value;
-            slider.value = value;
-        }
-    }
-
-    private bool _flashActive;
-    public bool FlashActive 
-    { 
-        get => _flashActive; 
-        set
-        {
-            _flashActive = value;
-            //FlashLight.enabled = value;
-            //StopAllCoroutines();
-            //StartCoroutine(Timer(value));
-        }
-    }
 
 
     private void Awake()
     {
-        FlashLight = GetComponentInChildren<Light>();
-        slider.minValue = 0;
-        slider.maxValue = _maxCharge;
-        Charge = _maxCharge;
-        FlashActive = true;
+          FlashLight = GetComponentInChildren<Light>();
+    }
+
+    private void ActiveFlashLight(bool val)
+    {
+        FlashLight.enabled = val;
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(control))
+        if(Input.GetKeyDown(control) && !FlashLight.enabled)
         {
-            FlashActive = !FlashActive;
+            ActiveFlashLight(true);
+        }
+        else if(Input.GetKeyDown(control) && FlashLight.enabled)
+        {
+            ActiveFlashLight(false);
         }
 
-    }
+        if(FlashLight.enabled)
+        {
+            currTime += Time.deltaTime;
+            if(currTime > timeout)
+            {
+                currTime = 0;
+                ActiveFlashLight(false);
+            }
+        }
 
-    private IEnumerator Timer(bool isDischarge)
-    {
-        if (isDischarge)
-        {
-            while (Charge > 0)
-            {
-                yield return new WaitForSeconds(1);
-                Charge--;
-                Debug.Log(Charge);
-            }
-            FlashActive = false;
-        }
-        else
-        {
-            while (Charge < _maxCharge)
-            {
-                yield return new WaitForSeconds(1);
-                Charge++;
-                Debug.Log(Charge);
-            }
-        }
     }
 }

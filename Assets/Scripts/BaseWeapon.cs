@@ -11,6 +11,7 @@ public abstract class BaseWeapon : BaseObject
     [SerializeField] protected Transform TMCam;
     [SerializeField] protected GameObject cross;
 
+
     protected override void Awake()
     {
         base.Awake();

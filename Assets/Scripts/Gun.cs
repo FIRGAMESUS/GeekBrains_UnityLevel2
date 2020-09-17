@@ -20,32 +20,33 @@ public class Gun : BaseWeapon
         _fire = true;
         currentBullCount = bulletCount;
 
-        if (prefab)
+        if(prefab)
         {
-            bullet = Resources.Load<GameObject>("Prefabs/Bullet");
+            bullet = Resources.Load<GameObject>("Prefabs/bullet");
             line = GetComponent<LineRenderer>();
             line.startWidth = 0.02f;
             line.endWidth = 0.02f;
         }
     }
+
     private Vector3 GetDirection(Vector3 HitPoint, Vector3 bulletPos)
     {
         Vector3 decr = HitPoint - bulletPos;
         float dist = decr.magnitude;
         return decr / dist;
     }
+
     public override void Fire()
     {
-        if (_fire && currentBullCount > 0)
+       if(_fire && currentBullCount > 0)
         {
             GOAnimator.SetTrigger("shoot");
             muzzleFlash.Play();
             currentBullCount--;
-
             RaycastHit hit;
             Ray ray = new Ray(TMCam.position, TMCam.forward);
 
-            if (prefab)
+            if(prefab)
             {
                 GameObject temp = Instantiate(bullet, gunT.position, Quaternion.identity);
                 Rigidbody BulletRG = temp.GetComponent<Rigidbody>();
@@ -53,7 +54,7 @@ public class Gun : BaseWeapon
                 temp.GetComponent<Bullet>().DestructionTime = 10f;
                 line.SetPosition(0, gunT.position);
 
-                if (Physics.Raycast(ray, out hit, shootDistance))
+                if(Physics.Raycast(ray, out hit, shootDistance))
                 {
                     BulletRG.AddForce(GetDirection(hit.point, gunT.position) * 100, ForceMode.Impulse);
                     line.SetPosition(1, hit.point);
@@ -68,7 +69,10 @@ public class Gun : BaseWeapon
             {
                 if (Physics.Raycast(ray, out hit, shootDistance))
                 {
-                    if (hit.collider.tag == "Player") return;
+                    if (hit.collider.tag == "Player")
+                    {
+                        return;
+                    }
                     else
                     {
                         SetDamage(hit.collider.GetComponent<ISetDamage>());
@@ -76,37 +80,39 @@ public class Gun : BaseWeapon
                 }
                 CreateParticleHit(hit);
             }
-
-            
         }
     }
 
+
     private void SetDamage(ISetDamage obj)
     {
-        if (obj != null)
+        if(obj!=null)
         {
             obj.SetDamage(damage);
         }
     }
+
     private void CreateParticleHit(RaycastHit hit)
     {
         GameObject tempHit = Instantiate(hitParticle, hit.point, Quaternion.identity);
         tempHit.transform.parent = hit.transform;
         Destroy(tempHit, 0.5f);
     }
+
     private void ReloadBullet()
     {
         _fire = true;
         currentBullCount = bulletCount;
     }
 
-    private void Update()
+    void Update()
     {
-        if (Input.GetButtonDown("Fire1"))
+        if(Input.GetButtonDown("Fire1"))
         {
             Fire();
         }
-        if (Input.GetKeyDown(Reload))
+
+        if(Input.GetKeyDown(Reload))
         {
             _fire = false;
             GOAnimator.SetTrigger("reload");

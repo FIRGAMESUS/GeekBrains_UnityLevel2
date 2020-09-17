@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class SinglePlayer : Unit
 {
@@ -8,7 +6,8 @@ public class SinglePlayer : Unit
     Ray ray;
     Transform McamT;
     Transform target;
-    bool grab;
+    private bool Grab;
+    [SerializeField] LayerMask Layer;
 
     void Start()
     {
@@ -17,31 +16,35 @@ public class SinglePlayer : Unit
         McamT = Camera.main.transform;
     }
 
+
     void Update()
     {
+
         ray = new Ray(McamT.position, McamT.forward);
-        if (Input.GetKeyDown(KeyCode.E))
+
+        if(Input.GetKeyDown(KeyCode.E))
         {
-            grab = !grab;
+            Grab = !Grab;
         }
-        if (grab)
+
+        if(Grab)
         {
-            if (Physics.Raycast(ray, out hit, 50))
+            if (Physics.Raycast(ray, out hit, 50, Layer))
             {
-                if (hit.collider.tag == "PickUp")
+                if (hit.collider.tag == "Pickup")
                 {
-                    hit.transform.GetComponent<Rigidbody>().isKinematic = true;
-                    target = hit.transform.parent.transform;
-                    target.parent = McamT;
+                   hit.transform.GetComponent<Rigidbody>().isKinematic = true;
+                   hit.transform.parent = McamT;
                 }
             }
         }
         else
         {
-            if (target)
+            if(hit.transform)
             {
-                target.parent = null;
+                hit.transform.parent = null;
                 hit.transform.GetComponent<Rigidbody>().isKinematic = false;
+                hit.transform.GetComponent<Rigidbody>().AddForce(Vector3.forward*0.5f, ForceMode.Impulse);
             }
         }
     }
