@@ -56,6 +56,8 @@ public class Bot : Unit
     [SerializeField] private LayerMask targetMask;
     [SerializeField] private LayerMask obstacleMask;
 
+    [TextArea(3, 5)] [SerializeField] private string Test;
+
 #if UNITY_EDITOR
 
     private void OnDrawGizmos()
