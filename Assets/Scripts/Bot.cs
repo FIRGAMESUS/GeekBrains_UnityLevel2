@@ -96,7 +96,7 @@ public class Bot : Unit
         base.Awake();
         _agent = GetComponent<NavMeshAgent>();
 
-        _playerT = GameObject.FindObjectOfType<SinglePlayer>().transform;
+        //_playerT = GameObject.FindObjectOfType<SinglePlayer>().transform;
 
         _agent.stoppingDistance = _stopDistance;
         _agent.updatePosition = true;
