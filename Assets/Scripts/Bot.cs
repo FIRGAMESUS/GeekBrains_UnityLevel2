@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEditor;
 
+[RequireComponent(typeof(NavMeshAgent))]
+[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(Animator))]
 
 public class Bot : Unit
 {
@@ -17,33 +20,39 @@ public class Bot : Unit
     [SerializeField] private GameObject wayPointMain; //change it to load from file
 
     [SerializeField] private float DelayFindTargets = 0.1f;
-    private float _seekDistance = 3f;
-    private float _stopDistance = 0.4f;
-    private float _attackDistance = 7f;
+
+    [Header("Дистанции остановки")]
+    [SerializeField] private float _seekDistance = 3f;
+    [SerializeField] private float _stopDistance = 0.4f;
+    [SerializeField] private float _attackDistance = 7f;
 
     private float timeWait = 3f;
     private float timeOut = 0;
 
+    [Header("Настройки для оружия")]
     //Shooting
+    [Tooltip("Объект добавляется автоматически, должен находиться на дуле оружия")] [SerializeField] protected Transform gunT;
+    [Tooltip("Объект добавляется автоматически")] [SerializeField] protected ParticleSystem muzzleFlash;
+    [Tooltip("Объект добавляется автоматически")] [SerializeField] protected GameObject hitParticle;
     private int bulletCount = 30;
     private int currentBullCount = 0;
     private float shootDistance = 1000f;
     private int damage = 20;
-    [SerializeField] protected Transform gunT;
-    [SerializeField] protected ParticleSystem muzzleFlash;
-    [SerializeField] protected GameObject hitParticle;
 
-
+    [Header("Состояние бота")]
     [SerializeField] private bool patrol;
     [SerializeField] private bool shooting;
 
+    [Header("Списки целей")]
     //Target
     [SerializeField] private Collider[] targetInViewRadius;
     [SerializeField] private List<Transform> visibleTargets = new List<Transform>();
 
+    [Header("Настройки зоны видимости")]
     [SerializeField] private float maxAngle = 30;//60
     [SerializeField] private float maxRadius = 10;
 
+    [Header("Физические слои")]
     [SerializeField] private LayerMask targetMask;
     [SerializeField] private LayerMask obstacleMask;
 
