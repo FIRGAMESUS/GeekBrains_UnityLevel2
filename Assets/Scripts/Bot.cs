@@ -49,8 +49,8 @@ public class Bot : Unit
     [SerializeField] private List<Transform> visibleTargets = new List<Transform>();
 
     [Header("Настройки зоны видимости")]
-    [SerializeField] private float maxAngle = 30;//60
-    [SerializeField] private float maxRadius = 10;
+    [SerializeField] [Range(30, 90)] private float maxAngle = 30;//60
+    [SerializeField] [Range(10, 40)] private float maxRadius = 10;
 
     [Header("Физические слои")]
     [SerializeField] private LayerMask targetMask;
