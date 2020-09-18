@@ -5,7 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - GunT
-  - PickUp
+  - Pickup
   layers:
   - Default
   - TransparentFX
@@ -16,9 +16,9 @@ TagManager:
   - 
   - 
   - Weapons
-  - 
-  - 
-  - 
+  - Pickups
+  - Targets
+  - Obstacle
   - 
   - 
   - 

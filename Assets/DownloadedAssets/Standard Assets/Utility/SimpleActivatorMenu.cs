@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-using TMPro;
+using UnityEngine.UI;
 
 #pragma warning disable 618
 namespace UnityStandardAssets.Utility
@@ -9,7 +9,7 @@ namespace UnityStandardAssets.Utility
     {
         // An incredibly simple menu which, when given references
         // to gameobjects in the scene
-        public TMP_Text camSwitchButton;
+        public Text camSwitchButton;
         public GameObject[] objects;
 
 

@@ -2659,21 +2659,28 @@ MonoBehaviour:
   _dead: 0
   wayPointMain: {fileID: 0}
   DelayFindTargets: 0.1
+  _seekDistance: 3
+  _stopDistance: 0.4
+  _attackDistance: 7
+  bulletCount: 30
+  shootDistance: 1000
+  damage: 20
   gunT: {fileID: 0}
   muzzleFlash: {fileID: 0}
   hitParticle: {fileID: 0}
-  patrol: 0
+  patrol: 1
   shooting: 0
   targetInViewRadius: []
   visibleTargets: []
   maxAngle: 30
-  maxRadius: 10.3
+  maxRadius: 20
   targetMask:
     serializedVersion: 2
     m_Bits: 1024
   obstacleMask:
     serializedVersion: 2
     m_Bits: 2048
+  Test: 
 --- !u!95 &870170912437787739
 Animator:
   serializedVersion: 3

@@ -7,7 +7,6 @@ using UnityEditor;
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(Animator))]
-
 public class Bot : Unit
 {
 
@@ -15,50 +14,71 @@ public class Bot : Unit
     private Transform _playerT;
     private Transform target;
 
-    private List<Vector3> _wayPoints = new List<Vector3>();
+    public List<Vector3> _wayPoints = new List<Vector3>();
     private int pointCounter;
-    [SerializeField] private GameObject wayPointMain; //change it to load from file
+   // [SerializeField] private GameObject wayPointMain; //change it to load from file
 
     [SerializeField] private float DelayFindTargets = 0.1f;
 
-    [Header("Дистанции остановки")]
+    [Header("Дистанции остановки: ")]
     [SerializeField] private float _seekDistance = 3f;
     [SerializeField] private float _stopDistance = 0.4f;
     [SerializeField] private float _attackDistance = 7f;
 
+
     private float timeWait = 3f;
     private float timeOut = 0;
 
-    [Header("Настройки для оружия")]
+
     //Shooting
-    [Tooltip("Объект добавляется автоматически, должен находиться на дуле оружия")] [SerializeField] protected Transform gunT;
+    [SerializeField] private int bulletCount = 30;
+    private int currentBullCount = 0;
+    [SerializeField] private float shootDistance = 1000f;
+    [SerializeField] private int damage = 20;
+    [Header("Настройки для оружия: ")]
+    [Tooltip("Объект добавляется автоматически, должен находиться на дуле оружия")][SerializeField] protected Transform gunT;
     [Tooltip("Объект добавляется автоматически")] [SerializeField] protected ParticleSystem muzzleFlash;
     [Tooltip("Объект добавляется автоматически")] [SerializeField] protected GameObject hitParticle;
-    private int bulletCount = 30;
-    private int currentBullCount = 0;
-    private float shootDistance = 1000f;
-    private int damage = 20;
 
-    [Header("Состояние бота")]
+
+    [Header("Состояния бота: ")]
     [SerializeField] private bool patrol;
     [SerializeField] private bool shooting;
 
-    [Header("Списки целей")]
     //Target
+    [Header("Списки целей: ")]
     [SerializeField] private Collider[] targetInViewRadius;
     [SerializeField] private List<Transform> visibleTargets = new List<Transform>();
 
-    [Header("Настройки зоны видимости")]
-    [SerializeField] [Range(30, 90)] private float maxAngle = 30;//60
+    [Header("Настройки зоны видимости: ")]
+    [SerializeField] [Range(30, 90)]private float maxAngle = 30;//60
     [SerializeField] [Range(10, 40)] private float maxRadius = 10;
 
-    [Header("Физические слои")]
     [SerializeField] private LayerMask targetMask;
     [SerializeField] private LayerMask obstacleMask;
+    [TextArea(3,5)][SerializeField] private string Test;
 
-    [TextArea(3, 5)] [SerializeField] private string Test;
+    public List<Vector3> WayPoints { get => _wayPoints; set => _wayPoints = value; }
 
 #if UNITY_EDITOR
+
+    [ContextMenu("Tools/Значения по умолчанию")]
+    public void Default()
+    {
+        bulletCount = 30;
+        shootDistance = 1000f;
+        damage = 20;
+        maxAngle = 30;
+        maxRadius = 20;
+        patrol = true;
+    }
+
+    [ContextMenu("Tools/Рандомные значения зоны видимости")]
+    public void Randomization()
+    {
+        maxRadius = Random.Range(30, 90);
+        maxAngle = Random.Range(10, 40);
+    }
 
     private void OnDrawGizmos()
     {
@@ -69,7 +89,9 @@ public class Bot : Unit
         Handles.DrawSolidArc(pos, transform.up, transform.forward, -maxAngle, maxRadius);
     }
 
+
 #endif
+
     IEnumerator Shoot(RaycastHit playerHit)
     {
         yield return new WaitForSeconds(0.5f);
@@ -96,7 +118,7 @@ public class Bot : Unit
         base.Awake();
         _agent = GetComponent<NavMeshAgent>();
 
-        //_playerT = GameObject.FindObjectOfType<SinglePlayer>().transform;
+        _playerT = GameObject.FindObjectOfType<SinglePlayer>().transform;
 
         _agent.stoppingDistance = _stopDistance;
         _agent.updatePosition = true;
@@ -106,10 +128,14 @@ public class Bot : Unit
         Health = 100;
         Dead = false;
 
-        foreach (Transform item in wayPointMain.transform)
-        {
-            _wayPoints.Add(item.position);
-        }
+        //if(wayPointMain)
+        //{
+        //    foreach (Transform item in wayPointMain.transform)
+        //    {
+        //        WayPoints.Add(item.position);
+        //    }
+        //}
+
 
         StartCoroutine(FindTargets(DelayFindTargets));
 
@@ -166,10 +192,10 @@ public class Bot : Unit
 
         if(patrol)
         {
-            if(_wayPoints.Count > 1)
+            if(WayPoints.Count > 1)
             {
                 _agent.stoppingDistance = _stopDistance;
-                _agent.SetDestination(_wayPoints[pointCounter]);
+                _agent.SetDestination(WayPoints[pointCounter]);
 
                 if(!_agent.hasPath)
                 {
@@ -177,7 +203,7 @@ public class Bot : Unit
                     if(timeOut>timeWait)
                     {
                         timeOut = 0;
-                        if(pointCounter < _wayPoints.Count-1)
+                        if(pointCounter < WayPoints.Count-1)
                         {
                             pointCounter++;
                         }
